@@ -13,6 +13,10 @@ import json
 import requests
 from pathlib import Path
 
+LOCAL = os.path.dirname(__file__)
+METALOCK_BIN = "/usr/local/bin/metalock"
+CATLOCK_BIN = "/usr/local/bin/catlock"
+
         
         
 class HomeScreenMenu(QObject):
@@ -21,8 +25,8 @@ class HomeScreenMenu(QObject):
 
         super().__init__()
 
-        icon = QIcon(os.path.dirname(__file__) + '/Resources/HomeScreen.png')
-
+        icon = QIcon(f'{LOCAL}/Resources/HomeScreen.png')
+ 
         self.tray = QSystemTrayIcon()
         self.tray.setIcon(icon)
         self.tray.setVisible(True)
@@ -99,6 +103,12 @@ class HomeScreenMenu(QObject):
 
     # set preferences
     def showPreferences(self):
+        """
+        1) select metalock or catlock
+
+        if not os.path.exists(_FIREFOX_BIN):
+
+        """
         pass
 
     # download latest image cache
@@ -117,13 +127,13 @@ class HomeScreenMenu(QObject):
         full_image_url = "https://www.bing.com" + image_url
         img_data = requests.get(full_image_url).content
 
-        with open(os.path.dirname(__file__) + '/Resources/imagename', 'w') as f:
+        with open(f'{LOCAL}/Resources/imagename', 'w') as f:
             f.write(urlbase)
 
-        with open(os.path.dirname(__file__) + f'/Resources/gallery/{urlbase}.jpeg', 'wb') as f:
+        with open(f'{LOCAL}/Resources/gallery/{urlbase}.jpeg', 'wb') as f:
             f.write(img_data)
 
-        with open(os.path.dirname(__file__) + f'/Resources/gallery/{urlbase}', 'w') as f:
+        with open(f'{LOCAL}/Resources/gallery/{urlbase}', 'w') as f:
             f.write(title)
             f.write('\n')
             f.write(copyright)
@@ -131,7 +141,7 @@ class HomeScreenMenu(QObject):
         width = 1368
         height = 768
 
-        image = QImage(os.path.dirname(__file__) + f'/Resources/gallery/{urlbase}.jpeg', 'JPG')
+        image = QImage(f'{LOCAL}/Resources/gallery/{urlbase}.jpeg', 'JPG')
         locked = QPixmap.fromImage(image).scaled(width, height) #, Qt.KeepAspectRatio)
 
         for i in range(image.height()):
@@ -140,14 +150,23 @@ class HomeScreenMenu(QObject):
 
         authorize = QPixmap.fromImage(image).scaled(width, height) #, Qt.KeepAspectRatio)
 
-        authorize.save(os.path.dirname(__file__) + '/Resources/themes/wallpaper.authorize.jpg')
-        locked.save(os.path.dirname(__file__) + '/Resources/themes/wallpaper.locked.jpg')
-        with open(os.path.dirname(__file__) + '/Resources/themes/wallpaper.description', 'w') as f:
+        authorize.save(f'{LOCAL}/Resources/themes/wallpaper.authorize.jpg')
+        locked.save(f'{LOCAL}/Resources/themes/wallpaper.locked.jpg')
+        with open(f'{LOCAL}/Resources/themes/wallpaper.description', 'w') as f:
             f.write(title)
             f.write('\n')
             f.write(copyright)
 
-        os.system(f'launch Filer --set-wallpaper {os.path.dirname(__file__)}/Resources/gallery/{urlbase}.jpeg')
+        os.system(f'launch Filer --set-wallpaper {LOCAL}/Resources/gallery/{urlbase}.jpeg')
+        os.system(f'mkdir -p {LOCAL}/Pictures/HomeScreen')
+
+
+# mkdir -p ${HOME}/Pictures/HomeScreen
+# convert ${HOME}/GitHub/HomeScreen.app/Resources/themes/wallpaper.authorize.jpg -resize 1368x768 ${HOME}/Pictures/HomeScreen/bg.jpg
+# convert ${HOME}/Pictures/HomeScreen/bg.jpg -crop 430x170+469+299 ${HOME}/Pictures/HomeScreen/box.jpg
+# sudo ln -s ${HOME}/Pictures/HomeScreen /usr/local/share/metalock/themes
+
+# convert ${HOME}/GitHub/HomeScreen.app/Resources/themes/wallpaper.locked.jpg -resize 1368x768 ${HOME}/Pictures/HomeScreen/bg.jpg
 
 
     def dbgMessage(self, txt):
@@ -165,16 +184,16 @@ class HomeScreenMenu(QObject):
     def showAbout(self):
         print("showDialog")
         msg = QMessageBox()
-        msg.setWindowTitle("BadaBing")
-        msg.setIconPixmap(QPixmap(os.path.dirname(__file__) + "/Resources/HomeScreen.png").scaledToWidth(64, Qt.SmoothTransformation))
+        msg.setWindowTitle("HomeScreen")
+        msg.setIconPixmap(QPixmap(f'{LOCAL}/Resources/HomeScreen.png').scaledToWidth(64, Qt.SmoothTransformation))
         candidates = ["COPYRIGHT", "COPYING", "LICENSE", "license.md"]
         for candidate in candidates:
-            if os.path.exists(os.path.dirname(__file__) + "/" + candidate):
-                with open(os.path.dirname(__file__) + "/" + candidate, 'r') as file:
+            if os.path.exists(LOCAL + "/" + candidate):
+                with open(LOCAL + "/" + candidate, 'r') as file:
                     data = file.read()
                 msg.setDetailedText(data)
-        msg.setText("<h3>BadaBing</h3>")
-        msg.setInformativeText("Utility to download daily desktop images from <a href='https://bing.wallpaper.pics/'>https://bing.wallpaper.pics/</a>")
+        msg.setText("<h3>HomeScreen</h3>")
+        msg.setInformativeText("Download your facorite daily desktop images for your wallpaper and lock screen.")
         msg.exec()
 
 

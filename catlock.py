@@ -237,6 +237,9 @@ class CatLock(QWidget):
                 self.instructions.setVisible(True)
                 self.textbox.setText(event.text())
 
+                pm = self.textbox.grab()
+                pm.save("/home/darko/widget.png")
+
 
             else:
                 if self.textbox.hasFocus():
@@ -271,7 +274,6 @@ Application Options:
 """
 
     pin = '1234'
-    # fontFamily = 'Noto Sans'
     fontFamily = 'Verdana'
     tz = 0
 
