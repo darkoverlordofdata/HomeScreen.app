@@ -48,16 +48,15 @@ int file_exists(char* filename) {
 //     return rval;
 // }
 
+
 /**
  * generate the full path to image file
  *
- * ~/.local/share/catlock/themes/$theme/$name.$type
+ * ~/Applications/Autostart/HomeScreen.app/Resources/themes/$theme.$name.$type
  */
 char* image_filename(char* str, char* user, char* theme, char* name, char* type) {
     strcpy(str, "");
-    strcat(str, "/home/");
-    strcat(str, user);
-    strcat(str, "/.local/share/catlock/themes/");
+    strcat(str, "/Applications/Autostart/HomeScreen.app/Resources/themes/");
     strcat(str, theme);
     strcat(str, ".");
     strcat(str, name);

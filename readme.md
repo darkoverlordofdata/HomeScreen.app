@@ -2,6 +2,16 @@
 
 coordinate login, wallpaper and lock screen into a theme.
 
+## Install
+Copy to /Applications/AutoStart
+
+or
+
+cd /Applications/Autostart
+git clone https://github.com/darkoverlordofdata/HomeScreen.app.git
+
+## Features
+
 * select screen lock - ( metalock, catlock, etc. )
 * set slim theme per screen lock :
 * * /usr/local/share/slim/themes/metalock
@@ -11,30 +21,33 @@ coordinate login, wallpaper and lock screen into a theme.
 * generate assets for slim theme
 
 
-## CatLock
-```
-versions:
-1. kitty-cat-lock written in C 
-2. catlock written in Vala - deprecated?
-3. catlock.py - QT doesn't make the cut. It's a good reference version for desired ui.
-4. tbd:
-4.1 catlock re-done in c++ as slimlock variant?
-4.2 kitty-cat-lock upgrade?
-```
+## To use Metalock:
+### metalock onetime:
+sudo pkg install metalock
+sudo ln -s /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper /usr/local/share/metalock/themes/WallPaper
+### metalock daily:
+convert /Applications/Autostart/HomeScreen.app/Resources/themes/wallpaper.locked.jpg -resize 1368x768 /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper/bg.jpg
 
+convert /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper/bg.jpg -crop 430x170+469+299 /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper/box.jpg
 
-## To Be Automated:
+## To use Catlock:
+### catlock onetime
+requires the developer image to be installed
 
-### one time
-mkdir -p /home/darko/Pictures/HomeScreen
-sudo ln -s /home/darko/Pictures/HomeScreen /usr/local/share/metalock/themes
-sudo ln -s /home/darko/Pictures/HomeScreen/bg.jpg /usr/local/share/slim/themes/HomeScreen/background.jpg
+sudo pkg install cmake ImageMagick7
 
-### daily
-convert /home/darko/GitHub/HomeScreen.app/Resources/themes/wallpaper.authorize.jpg -resize 1368x768 /home/darko/Pictures/HomeScreen/bg.jpg
+cd /Applications/Autostart/HomeScreen.app
+./configure
+cd build
+make
 
-convert /home/darko/Pictures/HomeScreen/bg.jpg -crop 430x170+469+299 /home/darko/Pictures/HomeScreen/box.jpg
+run /Applications/Autostart/HomeScreen.app/catlock -t wallpaper -p 420420
+### catlock daily
+run the showDownload proc in HomeScreen
 
-convert /home/darko/GitHub/HomeScreen.app/Resources/themes/wallpaper.locked.jpg -resize 1368x768 /home/darko/Pictures/HomeScreen/bg.jpg
-
-
+## ToDo:
+* automate onetime and daily procedures above, add to HomeScreen
+* add slimlock
+* add to catlock: --timezone -z flag to adjust time zone
+* add to catlock: display the wallpaper description text on the top of the screen
+* integrate avatar.png or ~/.iface into authorize screen

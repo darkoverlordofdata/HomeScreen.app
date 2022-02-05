@@ -18,11 +18,11 @@ include ( CMakeToolsHelpers OPTIONAL )
 #
 #   application source
 #
-list ( APPEND C_SOURCES src/calendar/calendar.c )
-list ( APPEND C_SOURCES src/application.c )
-list ( APPEND C_SOURCES src/helpers.c )
-list ( APPEND C_SOURCES src/main.c )
-list ( APPEND C_SOURCES src/polyfill.c )
+list ( APPEND C_SOURCES src/catlock/calendar/calendar.c )
+list ( APPEND C_SOURCES src/catlock/application.c )
+list ( APPEND C_SOURCES src/catlock/helpers.c )
+list ( APPEND C_SOURCES src/catlock/main.c )
+list ( APPEND C_SOURCES src/catlock/polyfill.c )
 #
 #   application includes
 #

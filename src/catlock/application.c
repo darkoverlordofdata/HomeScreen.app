@@ -231,7 +231,10 @@ int application_args(Application* this, int argc, char **argv) {
  * @param this
  */
 int application_draw(Application* this) {
-    time_t now = time(NULL);
+    
+    unsigned char circle[4] = { 0xE2, 0x97, 0x8F, 0x00 };
+
+    time_t now = time(NULL) - (60 * 60 * 3);
     struct tm *t = localtime(&now);
     char* instruc = "Enter PIN";
 
@@ -265,7 +268,11 @@ int application_draw(Application* this) {
         XftDrawString8(this->draw, &this->color, this->font_name, c,  480, (XftChar8 *)this->uline, strlen(this->uline));
         XftDrawRect(this->draw, &this->color, c1-1, 529, 302, 32);
         XftDrawRect(this->draw, &this->bgcolor, c1, 530, 300, 30);
-        XftDrawString8(this->draw, &this->color, this->font_pwd,  c1, 560, (XftChar8 *)this->pline, strlen(this->pline));
+        // 
+        for (int xx = 0; xx < strlen(this->pline); xx++) {
+            XftDrawStringUtf8(this->draw, &this->color, this->font_pwd,  c1+(xx*20)+3, 553, (XftChar8 *)circle, 3);
+        }
+        // XftDrawString8(this->draw, &this->color, this->font_pwd,  c1, 560, (XftChar8 *)this->pline, strlen(this->pline));
         XftDrawString8(this->draw, &this->color, this->font_small,  c2, 660, (XftChar8 *)instruc, strlen(instruc));
         break;
 
@@ -380,7 +387,12 @@ int application_run(Application* this) {
                 if (num && !iscntrl((int) this->buf[0]) && (this->len + num < BUFLEN)) {
                     memcpy(this->passwd + this->len, this->buf, num);
                     this->len += num;
-                    if (strlen(this->pline) < pass_num_show) { strcat(this->pline, "*"); }
+                    if (strlen(this->pline) < pass_num_show) {
+                        strcat(this->pline, "*");
+                        // strcat(this->pline, 0xe2000000); 
+                        // strcat(this->pline, 0xac000000); 
+                        // strcat(this->pline, 0xa4000000); 
+                    }
                     int new_pline_len = strlen(this->pline);
                     application_draw(this);
 
