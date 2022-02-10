@@ -8,6 +8,8 @@
 #include <pwd.h>
 #include <unistd.h>
 #include "polyfill.h"
+#include "application.h"
+
 
 void die(const char *errstr, ...);
 int file_exists(char* filename);
@@ -17,6 +19,8 @@ int file_exists(char* filename);
 // #endif
 
 char* image_filename(char* str, char* user, char* theme, char* name, char* type);
+char* desc_filename(char* str, char* user, char* theme, char* name);
 char* calendar_filename(char* str, char* user, char* name, char* type);
 int char_is_hex(char hexch);
 int string_is_hex(char* hexst);
+char* ReadFile(char *filename);

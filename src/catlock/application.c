@@ -34,6 +34,10 @@ Application* application_new(int argc, char **argv) {
     this->pline = calloc(BUFLEN, sizeof(char));
     this->tline = calloc(BUFLEN, sizeof(char));
     this->dline = calloc(BUFLEN, sizeof(char));
+    this->descfn = calloc(BUFLEN, sizeof(char));
+    this->copy1 =  calloc(BUFLEN, sizeof(char));
+    this->copy2 =  calloc(BUFLEN, sizeof(char));
+    this->title =  calloc(BUFLEN, sizeof(char));
     this->imgfn = calloc(BUFLEN, sizeof(char));
     this->boximgfn = calloc(BUFLEN, sizeof(char));
     this->buf = calloc(BUFLEN, sizeof(char));
@@ -69,10 +73,16 @@ void application_dispose(Application* this) {
     FREE_IF(this->tline);
     FREE_IF(this->dline);
     FREE_IF(this->imgfn);
+    FREE_IF(this->descfn);
+    FREE_IF(this->copy1);
+    FREE_IF(this->copy2);
+    FREE_IF(this->title);
     FREE_IF(this->boximgfn);
     FREE_IF(this->theme_name);
     FREE_IF(this->fontname);
     FREE_IF(this->fontname_small);
+    FREE_IF(this->fontname_copy);
+    FREE_IF(this->fontname_title);
     FREE_IF(this->fontname_name);
     FREE_IF(this->fontname_pwd);
     FREE_IF(this->fontname_date);
@@ -188,6 +198,8 @@ int application_args(Application* this, int argc, char **argv) {
 
     FREE_IF(this->fontname);
     FREE_IF(this->fontname_small);
+    FREE_IF(this->fontname_copy);
+    FREE_IF(this->fontname_title);
     FREE_IF(this->fontname_name);
     FREE_IF(this->fontname_pwd);
     FREE_IF(this->fontname_time);
@@ -196,12 +208,16 @@ int application_args(Application* this, int argc, char **argv) {
     this->fontname = strdup(name);
 
     char* fontsize_small = "8";
+    char* fontsize_copy = "12";
+    char* fontsize_title = "16";
     char* fontsize_name = "24";
     char* fontsize_pwd = "24";
     char* fontsize_date = "32";
     char* fontsize_time = "64";
 
     this->fontname_small = calloc(sizeof(char), strlen(this->fontname) + strlen(fontsize_small) + 1);
+    this->fontname_copy = calloc(sizeof(char), strlen(this->fontname) + strlen(fontsize_copy) + 1);
+    this->fontname_title = calloc(sizeof(char), strlen(this->fontname) + strlen(fontsize_title) + 1);
     this->fontname_name = calloc(sizeof(char), strlen(this->fontname) + strlen(fontsize_name) + 1);
     this->fontname_pwd  = calloc(sizeof(char), strlen(this->fontname) + strlen(fontsize_pwd) + 1);
     this->fontname_date = calloc(sizeof(char), strlen(this->fontname) + strlen(fontsize_date) + 1);
@@ -209,6 +225,12 @@ int application_args(Application* this, int argc, char **argv) {
 
     strcat(this->fontname_small, this->fontname);
     strcat(this->fontname_small, fontsize_small);
+
+    strcat(this->fontname_copy, this->fontname);
+    strcat(this->fontname_copy, fontsize_copy);
+
+    strcat(this->fontname_title, this->fontname);
+    strcat(this->fontname_title, fontsize_title);
 
     strcat(this->fontname_name, this->fontname);
     strcat(this->fontname_name, fontsize_name);
@@ -232,7 +254,7 @@ int application_args(Application* this, int argc, char **argv) {
  */
 int application_draw(Application* this) {
     
-    unsigned char circle[4] = { 0xE2, 0x97, 0x8F, 0x00 };
+    unsigned char pwdChar[4] = { 0xE2, 0x97, 0x8F, 0x00 };  // UTF8 filled in circle
 
     time_t now = time(NULL) - (60 * 60 * 3);
     struct tm *t = localtime(&now);
@@ -244,36 +266,47 @@ int application_draw(Application* this) {
     XClearWindow(this->disp, this->active);
 
     /**
-     * rough stab at font metrics...
-     * 300 pixels wide fits about 17-18 chars at 24 pt. 
-     */
-    const float fac24 = 300.0f/17.0f;
-    /** 
-     * and 8pt is 1/3 of 24 pt... 
-     */
-    const float fac08 = (300.0f/17.0f)/3.0f;
+    *   Generate font metrics...
+    */
+    XGlyphInfo extents = { 0 };
 
-    int c = (this->width-(int)(strlen(this->uline) * fac24))/2;
-    int c1 = ((this->width-300)/2);
-    int c2 = (this->width- (int)(strlen(instruc) * fac08))/2;
+    XftTextExtents8(this->disp, this->font_pwd, (XftChar8 *)this->uline, strlen(this->uline), &extents);
+    int passwordCol = (this->width-extents.width)/2;
+
+    XftTextExtents8(this->disp, this->font_small, (XftChar8 *)instruc, strlen(instruc), &extents);
+    int instrucCol = (this->width-extents.width)/2;
+
+    int inputWidth = 302;
+    int inputCol = ((this->width-inputWidth)/2);
 
     switch (this->state) {
 
     case ApplicationDate:
+        XftDrawStringUtf8(this->draw, &this->color, this->font_title, 60, 60, (XftChar8 *)this->title, strlen(this->title));
+        XftDrawStringUtf8(this->draw, &this->color, this->font_copy,  60, 85, (XftChar8 *)this->copy1, strlen(this->copy1));
+        XftDrawStringUtf8(this->draw, &this->color, this->font_small, 60, 110, (XftChar8 *)this->copy2, strlen(this->copy2));
+
         XftDrawString8(this->draw, &this->color, this->font_time, 40, 600, (XftChar8 *)this->tline, strlen(this->tline));
         XftDrawString8(this->draw, &this->color, this->font_date, 40, 670, (XftChar8 *)this->dline, strlen(this->dline));
         break;
 
     case ApplicationPassword:
-        XftDrawString8(this->draw, &this->color, this->font_name, c,  480, (XftChar8 *)this->uline, strlen(this->uline));
-        XftDrawRect(this->draw, &this->color, c1-1, 529, 302, 32);
-        XftDrawRect(this->draw, &this->bgcolor, c1, 530, 300, 30);
-        // 
+        XftDrawString8(this->draw, &this->color, this->font_name, passwordCol,  480, (XftChar8 *)this->uline, strlen(this->uline));
+        // XftDrawRect(this->draw, &this->color, inputCol-1, 529, 302, 32);
+        // XftDrawRect(this->draw, &this->bgcolor, inputCol, 530, 300, 30);
+
+        // for (int xx = 0; xx < strlen(this->pline); xx++) {
+        //     if (xx < 14)    
+        //         XftDrawStringUtf8(this->draw, &this->color, this->font_pwd,  passwordCol+(xx*20)-40, 553, (XftChar8 *)pwdChar, 3);
+        // }
+        XftDrawRect(this->draw, &this->bgcolor, inputCol-1, 529, 302, 32);
+        XftDrawRect(this->draw, &this->color, inputCol, 530, 300, 30);
+
         for (int xx = 0; xx < strlen(this->pline); xx++) {
-            XftDrawStringUtf8(this->draw, &this->color, this->font_pwd,  c1+(xx*20)+3, 553, (XftChar8 *)circle, 3);
+            if (xx < 14)    
+                XftDrawStringUtf8(this->draw, &this->bgcolor, this->font_pwd,  passwordCol+(xx*20)-40, 553, (XftChar8 *)pwdChar, 3);
         }
-        // XftDrawString8(this->draw, &this->color, this->font_pwd,  c1, 560, (XftChar8 *)this->pline, strlen(this->pline));
-        XftDrawString8(this->draw, &this->color, this->font_small,  c2, 660, (XftChar8 *)instruc, strlen(instruc));
+        XftDrawString8(this->draw, &this->color, this->font_small,  instrucCol, 660, (XftChar8 *)instruc, strlen(instruc));
         break;
 
     default: 
@@ -389,9 +422,6 @@ int application_run(Application* this) {
                     this->len += num;
                     if (strlen(this->pline) < pass_num_show) {
                         strcat(this->pline, "*");
-                        // strcat(this->pline, 0xe2000000); 
-                        // strcat(this->pline, 0xac000000); 
-                        // strcat(this->pline, 0xa4000000); 
                     }
                     int new_pline_len = strlen(this->pline);
                     application_draw(this);
@@ -493,6 +523,9 @@ void application_event(Application* this, ApplicationEvent evt)
  */
 void application_image_files(Application* this)
 {
+    if (*this->descfn == '\0' || file_exists(this->descfn) < 0)
+        desc_filename(this->descfn, this->user_name, this->theme_name, "description");
+
     if (*this->imgfn == '\0' || file_exists(this->imgfn) < 0)
         image_filename(this->imgfn, this->user_name, this->theme_name, "locked", "png");
     if (*this->imgfn == '\0' || file_exists(this->imgfn) < 0)
@@ -520,6 +553,12 @@ void application_image_files(Application* this)
 
     if (this->verbosity > 1)
         printf("box image filename: %s\n\n", this->boximgfn);
+
+
+    if (file_exists(this->descfn) < 0) {
+        printf("description %s does not exist\n", this->descfn);
+        exit(0);
+    }
 
     if (file_exists(this->imgfn) < 0) {
         printf("image %s does not exist\n", this->imgfn);

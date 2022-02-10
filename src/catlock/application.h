@@ -80,11 +80,15 @@ struct Application
     char* theme_name;
     char* fontname;
     char* fontname_small;
+    char* fontname_copy;
+    char* fontname_title;
     char* fontname_name;
     char* fontname_pwd;
     char* fontname_time;
     char* fontname_date;
     XftFont *font_small;
+    XftFont *font_copy;
+    XftFont *font_title;
     XftFont *font_name;
     XftFont *font_pwd;
     XftFont *font_time;
@@ -93,8 +97,12 @@ struct Application
     char* pline;
     char* tline;
     char* dline;
+    char* descfn;
     char* imgfn;
     char* boximgfn;
+    char* copy1;
+    char* copy2;
+    char* title;
 
 };
 

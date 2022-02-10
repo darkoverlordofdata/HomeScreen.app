@@ -42,8 +42,17 @@ int main(int argc, char **argv) {
 
     app->cm = DefaultColormap(app->disp, app->screen);
 
-    XColor bg = { 0, 0, 0, 0 }; // black
-    XColor fg = { 0, 65535, 65535, 65535 }; // white
+    // XColor bg = { 0, 0, 0, 0 }; // black
+    // XColor fg = { 0, 0x0ffff, 0x0ffff, 0x0ffff }; // white
+
+    XColor bg;
+    XParseColor(app->disp, DefaultColormap(app->disp, app->screen), "DarkSlateGray", &bg);
+    XAllocColor(app->disp, DefaultColormap(app->disp, app->screen), &bg);
+
+    XColor fg;
+    XParseColor(app->disp, DefaultColormap(app->disp, app->screen), "Navajo White", &fg);
+    XAllocColor(app->disp, DefaultColormap(app->disp, app->screen), &fg);
+    // XColor fg = { 0, 65535, 65535, 65535 }; // white
 
     XAllocColor(app->disp, app->cm, &bg);
     XAllocColor(app->disp, app->cm, &fg);
@@ -60,7 +69,35 @@ int main(int argc, char **argv) {
     imlib_context_set_display(app->disp);
     imlib_context_set_visual(vis);
     application_image_files(app);
+    char* buf = ReadFile(app->descfn);
+
+    // split at lf
+    char* i1 = strstr(buf, "\n");
+
+    *i1 = '\0';
+    app->title = strdup(buf);
+
+    char *rem = strdup(&i1[1]);
+
+    char* i2 = strstr(rem, "(©");
+
+    *i2 = '\0';
+    app->copy1 = strdup(rem); 
+    app->copy2 = strdup(&i2[1]);
+
+    char* eos = strstr(app->copy2, ")");
+    *eos = '\0';
     
+// The truth is out there…but not on this rock
+// Rock art near Santa Fe, New Mexico (© Scott Warren/Cavan)
+
+    // printf("%s\n", app->title);
+    // printf("%s\n", app->copy1);
+    // printf("%s\n", app->copy2);
+
+    free(rem);
+    free(buf);
+
     /* Load the top level background image */
     Imlib_Image image = imlib_load_image(app->imgfn);
     imlib_context_set_image(image);
@@ -129,6 +166,8 @@ int main(int argc, char **argv) {
     }
   
     app->font_small = XftFontOpenName(app->disp, app->screen, app->fontname_small);
+    app->font_copy = XftFontOpenName(app->disp, app->screen, app->fontname_copy);
+    app->font_title = XftFontOpenName(app->disp, app->screen, app->fontname_title);
     app->font_pwd = XftFontOpenName(app->disp, app->screen, app->fontname_pwd);
     app->font_time = XftFontOpenName(app->disp, app->screen, app->fontname_time);
     app->font_date = XftFontOpenName(app->disp, app->screen, app->fontname_date);
