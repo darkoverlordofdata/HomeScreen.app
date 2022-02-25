@@ -1,69 +1,34 @@
-# homescreen.app
+# wallpaper.app
 
-coordinate login, wallpaper and lock screen into a theme.
+coordinate wallpaper and lock screen into a theme.
 
-## Requirements
-* Image Magick 
-* Metalock 
-* CMake
-```
-sudo pkg install cmake ImageMagick7 metalock
-```
-
+catlock.py is based on my vala catlock code, using pyqt5
+HomeScreen is a panel bar app to set up the infastructure.
+This will become a standad app.
 
 ## Install
-Copy to /Applications/AutoStart
 
-or
+### helloSystem
+Copy to ~Applications
 
-cd /Applications/AutostartImageMagick7
-git clone https://github.com/darkoverlordofdata/HomeScreen.app.git
+### Debian Bullseye
+copy project to .local/share
+copy ./applications .local/share/applications
+
+#### optional - 
+if keybinding is not available
+
+copy alacarte-made.dockitem to /home/pi/.config/plank/dock1/launchers
 
 ## Features
 
-* select screen lock - ( metalock, catlock, etc. )
-* set slim theme per screen lock :
-* * /usr/local/share/slim/themes/metalock
-* * /usr/local/share/slim/themes/catlock
-* download daily wallpaper - ( bing, etc. )
+* select screen lock - ( metalock, catlock.py, etc. )
+* download daily wallpaper - ( bing, etc. ) with chron
 * generate assets for selected screenlock
-* generate assets for slim theme
+* maintain last 7 days history
+* screen lock can cycle thru history and show last weeks worth pictures
+
+### Implementation
 
 
-/Applications/Autostart/HomeScreen.app/catlock -t wallpaper -p 420420
-
-## To use Metalock:
-### metalock onetime:
-sudo ln -s /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper /usr/local/share/metalock/themes/WallPaper
-### metalock daily:
-convert /Applications/Autostart/HomeScreen.app/Resources/themes/wallpaper.locked.jpg -resize 1368x768 /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper/bg.jpg
-
-convert /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper/bg.jpg -crop 430x170+469+299 /Applications/Autostart/HomeScreen.app/Resources/themes/WallPaper/box.jpg
-
-## To use Catlock:
-### catlock onetime
-requires the developer image to be installed
-
-cd /Applications/Autostart/HomeScreen.app
-./configure
-cd build
-make
-
-run /Applications/Autostart/HomeScreen.app/catlock -t wallpaper -p 420420
-### catlock daily
-run the showDownload proc in HomeScreen
-
-## ToDo:
-* automate onetime and daily procedures above, add to HomeScreen
-* add slimlock
-* add to catlock: --timezone -z flag to adjust time zone
-* add to catlock: display the wallpaper description text on the top of the screen
-* integrate avatar.png or ~/.iface into authorize screen
-
-
-/Applications/Autostart/HomeScreen.app/catlock -t wallpaper -p 420420
-
-cron:
-
-0 */6 * * * com.github.darkoverlordofdata.badabing --update >/dev/null 2>&1
 

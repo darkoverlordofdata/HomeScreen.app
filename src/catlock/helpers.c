@@ -52,11 +52,11 @@ int file_exists(char* filename) {
 /**
  * generate the full path to image file
  *
- * ~/Applications/Autostart/HomeScreen.app/Resources/themes/$theme.$name.$type
+ * ~/home/pi/Documents/GitHub/HomeScreen.app/Resources/themes/$theme.$name.$type
  */
 char* image_filename(char* str, char* user, char* theme, char* name, char* type) {
     strcpy(str, "");
-    strcat(str, "/Applications/Autostart/HomeScreen.app/Resources/themes/");
+    strcat(str, "/home/pi/Documents/GitHub/HomeScreen.app/Resources/themes/");
     strcat(str, theme);
     strcat(str, ".");
     strcat(str, name);
@@ -68,7 +68,7 @@ char* image_filename(char* str, char* user, char* theme, char* name, char* type)
 
 char* desc_filename(char* str, char* user, char* theme, char* name) {
     strcpy(str, "");
-    strcat(str, "/Applications/Autostart/HomeScreen.app/Resources/themes/");
+    strcat(str, "/home/pi/Documents/GitHub/HomeScreen.app/Resources/themes/");
     strcat(str, theme);
     strcat(str, ".");
     strcat(str, name);

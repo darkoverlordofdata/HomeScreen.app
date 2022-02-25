@@ -12,6 +12,7 @@ import datetime
 import json
 import requests
 from pathlib import Path
+from os.path import exists
 
 LOCAL = os.path.dirname(__file__)
 METALOCK_BIN = "/usr/local/bin/metalock"
@@ -21,12 +22,14 @@ CATLOCK_BIN = "/usr/local/bin/catlock"
         
 class HomeScreenMenu(QObject):
 
-    def __init__(self):
+    def __init__(self, width, height):
 
         super().__init__()
 
         icon = QIcon(f'{LOCAL}/Resources/HomeScreen.png')
  
+        self.width = width
+        self.height = height
         self.tray = QSystemTrayIcon()
         self.tray.setIcon(icon)
         self.tray.setVisible(True)
@@ -94,6 +97,8 @@ class HomeScreenMenu(QObject):
         self.actions.append(action)
         self.menu.addAction(action)
 
+        # self.showDownload()
+
     def exit(self, widget):
         sys.exit()
 
@@ -138,17 +143,17 @@ class HomeScreenMenu(QObject):
             f.write('\n')
             f.write(copyright)
 
-        width = 1368
-        height = 768
+        # width = 1920 # 1368
+        # height = 1080 # 768
 
         image = QImage(f'{LOCAL}/Resources/gallery/{urlbase}.jpeg', 'JPG')
-        locked = QPixmap.fromImage(image).scaled(width, height) #, Qt.KeepAspectRatio)
+        locked = QPixmap.fromImage(image).scaled(self.width, self.height) #, Qt.KeepAspectRatio)
 
         for i in range(image.height()):
             for k in range(image.width()):
                 image.setPixelColor(k, i, image.pixelColor(k,i).darker(160))
 
-        authorize = QPixmap.fromImage(image).scaled(width, height) #, Qt.KeepAspectRatio)
+        authorize = QPixmap.fromImage(image).scaled(self.width, self.height) #, Qt.KeepAspectRatio)
 
         authorize.save(f'{LOCAL}/Resources/themes/wallpaper.authorize.jpg')
         locked.save(f'{LOCAL}/Resources/themes/wallpaper.locked.jpg')
@@ -157,7 +162,18 @@ class HomeScreenMenu(QObject):
             f.write('\n')
             f.write(copyright)
 
-        os.system(f'launch Filer --set-wallpaper {LOCAL}/Resources/gallery/{urlbase}.jpeg')
+        # helloSystem
+        if exists('/usr/local/bin/launch'): 
+            os.system(f'launch Filer --set-wallpaper {LOCAL}/Resources/gallery/{urlbase}.jpeg')
+
+        # LXDE
+        elif exists('/usr/bin/pcmanfm'): 
+            os.system(f'pcmanfm --set-wallpaper {LOCAL}/Resources/gallery/{urlbase}.jpeg')
+
+        # Unknown        
+        else:
+            print('oops!')
+
         os.system(f'mkdir -p {LOCAL}/Pictures/HomeScreen')
 
 
@@ -210,7 +226,12 @@ if __name__ == "__main__":
     p.waitForFinished()
 
     app = QApplication(sys.argv)
+    screen = app.primaryScreen()
+    size = screen.size()
+    width = size.width()
+    height = size.height()
+
     app.setQuitOnLastWindowClosed(False)
     app.setAttribute(Qt.AA_UseHighDpiPixmaps)
-    VM = HomeScreenMenu()
+    VM = HomeScreenMenu(width, height)
     sys.exit(app.exec_())

@@ -3,9 +3,9 @@
 Version=1.0 
 Type=Application 
 Terminal=false 
-Icon[en_US]=file:///Applications/HomeScreen.app/Resources/HomeScreen.png 
+Icon[en_US]=file:///home/pi/.local/share/HomeScreen.app/Resources/HomeScreen.png 
 Name[en_US]=HomeScreen 
-Exec=/Applications/HomeScreen.app/HomeScreen
+Exec=/home/pi/.local/share/HomeScreen.app/HomeScreen
 Comment[en_US]=set resolution 
 Name=resolution 
 Comment=set resolution 

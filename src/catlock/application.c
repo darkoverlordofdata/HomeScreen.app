@@ -47,6 +47,17 @@ Application* application_new(int argc, char **argv) {
     struct passwd *pw = getpwuid(getuid());
     this->user_name = strdup(pw->pw_name);
     this->full_name = strdup(pw->pw_gecos);
+
+    // printf("user_name: %s\n", this->user_name);
+    // printf("full_name: %s\n", this->full_name);
+
+    if (strcmp(",,,", this->full_name) == 0) {
+        FREE_IF(this->full_name);
+        this->full_name = strdup(pw->pw_name);
+
+    }
+
+
     application_args(this, argc, argv);
     if (strcmp(this->calendar, "") == 0)
         this->holidays = NULL;
@@ -256,7 +267,7 @@ int application_draw(Application* this) {
     
     unsigned char pwdChar[4] = { 0xE2, 0x97, 0x8F, 0x00 };  // UTF8 filled in circle
 
-    time_t now = time(NULL) - (60 * 60 * 3);
+    time_t now = time(NULL);// - (60 * 60 * 3);
     struct tm *t = localtime(&now);
     char* instruc = "Enter PIN";
 
@@ -286,25 +297,24 @@ int application_draw(Application* this) {
         XftDrawStringUtf8(this->draw, &this->color, this->font_copy,  60, 85, (XftChar8 *)this->copy1, strlen(this->copy1));
         XftDrawStringUtf8(this->draw, &this->color, this->font_small, 60, 110, (XftChar8 *)this->copy2, strlen(this->copy2));
 
-        XftDrawString8(this->draw, &this->color, this->font_time, 40, 600, (XftChar8 *)this->tline, strlen(this->tline));
-        XftDrawString8(this->draw, &this->color, this->font_date, 40, 670, (XftChar8 *)this->dline, strlen(this->dline));
+        // XftDrawString8(this->draw, &this->color, this->font_time, 40, 600, (XftChar8 *)this->tline, strlen(this->tline));
+        // XftDrawString8(this->draw, &this->color, this->font_date, 40, 670, (XftChar8 *)this->dline, strlen(this->dline));
+        // TODO: taller screen; need screen dimensions
+        XftDrawString8(this->draw, &this->color, this->font_time, 40, 900, (XftChar8 *)this->tline, strlen(this->tline));
+        XftDrawString8(this->draw, &this->color, this->font_date, 40, 970, (XftChar8 *)this->dline, strlen(this->dline));
         break;
 
     case ApplicationPassword:
         XftDrawString8(this->draw, &this->color, this->font_name, passwordCol,  480, (XftChar8 *)this->uline, strlen(this->uline));
-        // XftDrawRect(this->draw, &this->color, inputCol-1, 529, 302, 32);
-        // XftDrawRect(this->draw, &this->bgcolor, inputCol, 530, 300, 30);
 
-        // for (int xx = 0; xx < strlen(this->pline); xx++) {
-        //     if (xx < 14)    
-        //         XftDrawStringUtf8(this->draw, &this->color, this->font_pwd,  passwordCol+(xx*20)-40, 553, (XftChar8 *)pwdChar, 3);
-        // }
         XftDrawRect(this->draw, &this->bgcolor, inputCol-1, 529, 302, 32);
         XftDrawRect(this->draw, &this->color, inputCol, 530, 300, 30);
 
         for (int xx = 0; xx < strlen(this->pline); xx++) {
             if (xx < 14)    
-                XftDrawStringUtf8(this->draw, &this->bgcolor, this->font_pwd,  passwordCol+(xx*20)-40, 553, (XftChar8 *)pwdChar, 3);
+                // XftDrawStringUtf8(this->draw, &this->bgcolor, this->font_pwd,  passwordCol+(xx*20)-40, 553, (XftChar8 *)pwdChar, 3);
+                // TODO: wider screen; need screen dimensions
+                XftDrawStringUtf8(this->draw, &this->bgcolor, this->font_pwd,  passwordCol+(xx*30)-130, 553, (XftChar8 *)pwdChar, 3);
         }
         XftDrawString8(this->draw, &this->color, this->font_small,  instrucCol, 660, (XftChar8 *)instruc, strlen(instruc));
         break;

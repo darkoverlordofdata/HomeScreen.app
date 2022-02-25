@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=CatLock
+Exec=/home/pi/.local/share/HomeScreen.app/Resources/catlock.sh
+Comment=
+Terminal=false
+Icon=/home/pi/.local/share/HomeScreen.app/Resources/catlock.png
+Type=Application

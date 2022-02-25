@@ -46,11 +46,18 @@ int main(int argc, char **argv) {
     // XColor fg = { 0, 0x0ffff, 0x0ffff, 0x0ffff }; // white
 
     XColor bg;
+    // TODO: use options
+    //  --bg-color DarkSlateGray
+    //      default is black
     XParseColor(app->disp, DefaultColormap(app->disp, app->screen), "DarkSlateGray", &bg);
     XAllocColor(app->disp, DefaultColormap(app->disp, app->screen), &bg);
 
     XColor fg;
-    XParseColor(app->disp, DefaultColormap(app->disp, app->screen), "Navajo White", &fg);
+    // TODO: use options
+    //  --fg-color Navajo White
+    //      default is white
+    // XParseColor(app->disp, DefaultColormap(app->disp, app->screen), "Navajo White", &fg);
+    XParseColor(app->disp, DefaultColormap(app->disp, app->screen), "White", &fg);
     XAllocColor(app->disp, DefaultColormap(app->disp, app->screen), &fg);
     // XColor fg = { 0, 65535, 65535, 65535 }; // white
 
