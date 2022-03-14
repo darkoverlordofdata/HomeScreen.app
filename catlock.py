@@ -10,15 +10,57 @@ I can't use it myself if it can't protect from my cat!
 
 
 """
+import os 
+import pwd
+import sys
+import time
+import getopt
+import datetime
+import threading
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit
+from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtCore import Qt, QTimer, QDateTime
+from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusReply
 
-import os, sys, getopt, getpass, pwd
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QShortcut
-from PyQt5.QtGui import QIcon, QPixmap, QRegExpValidator, QFont, QImage, QKeySequence
-from PyQt5.QtCore import Qt, pyqtSlot, QRegExp, QTimer, QTime, QDateTime
+HOME = os.getenv('HOME')
+LOCAL = os.path.dirname(os.path.abspath(__file__))
+
+"""
+RepeatedTimer
+
+Run every 10 minutes check if a new wallpaper has been downloaded
+"""
+class RepeatedTimer(object):
+  def __init__(self, interval, function, *args, **kwargs):
+    self._timer = None
+    self.interval = interval
+    self.function = function
+    self.args = args
+    self.kwargs = kwargs
+    self.is_running = False
+    self.next_call = time.time()
+    self.start()
+
+  def _run(self):
+    self.is_running = False
+    self.start()
+    self.function(*self.args, **self.kwargs)
+
+  def start(self):
+    if not self.is_running:
+      self.next_call += self.interval
+      self._timer = threading.Timer(self.next_call - time.time(), self._run)
+      self._timer.start()
+      self.is_running = True
+
+  def stop(self):
+    self._timer.cancel()
+    self.is_running = False
+
 
 class CatLock(QWidget):
 
-    def __init__(self, sysname, pin, fontFamily, tz, width, height):
+    def __init__(self, dbus, valid, sysname, pin, fontFamily, tz, width, height):
         """
         CatLock application
         """
@@ -28,19 +70,15 @@ class CatLock(QWidget):
         self.lockedFlag = True
         self.counter = 0
         self.eol = 0
+        self.rollover = False
 
-        # self.installEventFilter(self)
-
-        self.setWindowFlags(
+        self.setWindowFlags(    # M a g i c k !
                               Qt.WindowStaysOnTopHint       # cover eveything else
                             | Qt.FramelessWindowHint        # no border
                             | Qt.X11BypassWindowManagerHint # displays on top of panels
                             | Qt.Popup                      # recapture keyboard input fom menu
                             )
 
-        # self.msgSc = QShortcut(QKeySequence('Ctrl+SPACE'), self)
-        # self.msgSc.activated.connect(lambda : QMessageBox.information(self,
-        #             'Message', 'Ctrl + M initiated'))        
         self.activateWindow()
         self.raise_()
         self.grabKeyboard()
@@ -49,41 +87,40 @@ class CatLock(QWidget):
         self.top = 0
         self.width = width
         self.height = height
+        self.dbus = dbus
+        self.valid = valid
         self.sysname = sysname
         self.count = 0
         self.pin = pin
         self.fontFamily = fontFamily
         self.tz = tz
         self.full_name = pwd.getpwuid(os.getuid()).pw_gecos
-        if self.full_name == ",,,":
+        self.full_name = self.full_name.replace(",,,", "")
+        if self.full_name == "":
             self.full_name = pwd.getpwuid(os.getuid()).pw_name
 
 
-        local = os.path.dirname(os.path.abspath(__file__))
-
-        with open(local + '/Resources/themes/wallpaper.description') as f:
+        with open(LOCAL + '/Resources/themes/wallpaper.description') as f:
             self.title = f.readline()
             tmp = f.readline()
             self.info = tmp.split("(")[0]
             self.copyright = tmp.split("(")[1]
 
-        self.authorize = QPixmap(local + '/Resources/themes/wallpaper.authorize.jpg')
-        self.locked = QPixmap(local + '/Resources/themes/wallpaper.locked.jpg')
+        self.authorize = QPixmap(LOCAL + '/Resources/themes/wallpaper.authorize.jpg')
+        self.locked = QPixmap(LOCAL + '/Resources/themes/wallpaper.locked.jpg')
 
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        home = os.getenv('HOME')
-        if os.path.exists(f'/{home}/.iface'):
-            self.avatar = QPixmap(f'{home}/.iface')
+        if os.path.exists(f'/{HOME}/.iface'):
+            self.avatar = QPixmap(f'{HOME}/.iface')
         else:
-            self.avatar = QPixmap(local + '/Resources/avatar.png')
+            self.avatar = QPixmap(LOCAL + '/Resources/avatar.png')
     
         fnt_60 = QFont(self.fontFamily, 60, QFont.Normal)
         fnt_30 = QFont(self.fontFamily, 30, QFont.Normal)
         fnt_20 = QFont(self.fontFamily, 20, QFont.Normal)
         fnt_12 = QFont(self.fontFamily, 12, QFont.Normal)
         fnt_10 = QFont(self.fontFamily, 10, QFont.Normal)
-
 
         self.background = QLabel(self)
         self.background.setPixmap(self.locked)
@@ -102,13 +139,13 @@ class CatLock(QWidget):
 
         self.textbox = QLineEdit(self)
         self.textbox.setEchoMode(QLineEdit.Password)
+        self.textbox.setFont(fnt_30)
         
-        # https://stackoverflow.com/questions/1247762/regex-for-all-printable-characters
-        # reg_ex = QRegExp("\P{Cc}\P{Cn}\P{Cs}")
-        # input_validator = QRegExpValidator(reg_ex, self.textbox)
-        # self.textbox.setValidator(input_validator)
-        self.textbox.move(int((self.width*.5)-140), int(self.height*.666))
-        self.textbox.resize(280,40)
+        x = int((self.width*.5)-125)
+        y = int(self.height*.666)
+
+        self.textbox.move(x, y)
+        self.textbox.resize(280, 50)
         self.textbox.setVisible(False)
 
         self.instructions = QLabel(self)
@@ -137,20 +174,6 @@ class CatLock(QWidget):
         self.copybox.move(60, 110)
         self.copybox.setStyleSheet("color: white")
 
-        #
-        # 1366 x 768
-        # 530, 650
-        # 1920 x 1080
-        # 800, 925
-
-        # 75%, 85%
-        # 
-
-        
-        # row1 = int(self.height * 0.70)
-        # row2 = int(self.height * 0.85)
-
-
         self.clock = QLabel(self)
         self.clock.setFont(fnt_60)
         self.clock.move(60, int(self.height * 0.70))
@@ -170,27 +193,34 @@ class CatLock(QWidget):
         timer.start(1000) # update every second
         self.show()
 
+        self.rt = RepeatedTimer(60, checkDownloadStatus, self, valid, dbus) 
+        
     def eventFilter(self, source, event):
         print(source)
         print(event)
         return super(CatLock, self).eventFilter(source, event)
 
     def showTime(self):
+        current_date = datetime.date.today()
+
+        t = datetime.time()
+
+        if self.rollover == True:
+            print("Rollover?")
+            # same time that download runs+10
+
         currentTime = QDateTime.currentDateTime()
-        adj = 60*60*(self.tz) # 'cause i'm stuck in EDT
+        adj = 60*60*(self.tz)   # because I'm stuck in Eastern Time Zone (helloSystem)
+
         currentTime = currentTime.addSecs(adj)
 
         self.clock.setText(currentTime.toString('h:mm a'))
         self.calendar.setText(currentTime.toString('dddd, MMMM d'))
 
-        # self.eol += 1
-        # if self.eol > 10:
-        #     self.exitLock()
-
         # check if we're ready to return to lock screen
         if self.lockedFlag == False:
             self.counter += 1
-            if self.counter > 30:
+            if self.counter > 10: #30:
                 self.lockedFlag = True
                 self.background.setPixmap(self.locked)
                 self.textbox.setText("")
@@ -265,28 +295,74 @@ class CatLock(QWidget):
                 self.instructions.setVisible(True)
                 self.textbox.setText(event.text())
 
-                # pm = self.textbox.grab()
-                # pm.save("/home/darko/widget.png")
-
-
             else:
                 if self.textbox.hasFocus():
                     if self.textbox.text() == self.pin:
                         self.exitLock()
                 else:
                     self.textbox.setText(self.textbox.text()+event.text())
+                    self.textbox.repaint()
                     if self.textbox.text() == self.pin:
-                        self.exitLock()
+                        QTimer.singleShot(250, lambda:self.exitLock())  
 
     def exitLock(self):
         """
         exit screen lock
         """
+        self.rt.stop() 
+
         self.releaseKeyboard()
         self.releaseMouse()
         self.close()
         exit()
 
+    def reset(self):
+        self.counter = 0
+        self.lockedFlag = True
+        self.background.setPixmap(self.locked)
+        self.textbox.setText("")
+        self.textbox.setVisible(False)
+        self.username.setVisible(False)
+        self.userpic.setVisible(False)
+        self.instructions.setVisible(False)
+
+        self.titlebox.setVisible(True)
+        self.infobox.setVisible(True)
+        self.copybox.setVisible(True)
+        self.clock.setVisible(True)
+        self.calendar.setVisible(True)  
+
+
+
+def checkDownloadStatus(self, valid, dbus):
+    if valid:
+        print("checkDownloadStatus: dbus.isValid()?")
+        if dbus.isValid():
+            print("dbus is valid")
+            msg = dbus.call('downloaded', sys.argv[1] if len(sys.argv) > 1 else "")
+            reply = QDBusReply(msg)
+
+            if reply.isValid():
+                if reply.value() == True:
+                    print("checkDownloadStatus: dbus returned True")
+                    # load new screen image
+                    with open(LOCAL + '/Resources/themes/wallpaper.description') as f:
+                        self.title = f.readline()
+                        tmp = f.readline()
+                        self.info = tmp.split("(")[0]
+                        self.copyright = tmp.split("(")[1]
+
+                    self.authorize = QPixmap(LOCAL + '/Resources/themes/wallpaper.authorize.jpg')
+                    self.locked = QPixmap(LOCAL + '/Resources/themes/wallpaper.locked.jpg')
+                    self.reset()
+
+                    # restart program & exit
+                    # subprocess.Popen(["python3", f'{LOCAL}/catlock.py'])   
+                    # self.exitLock()
+                else:
+                    print("checkDownloadStatus: dbus returned False")
+            else:
+                print("checkDownloadStatus: reply not valid")
 
 
 if __name__ == '__main__':
@@ -305,10 +381,26 @@ Application Options:
     pin = '1234'
     fontFamily = 'Verdana'
     tz = 0
-
-    
+    dbus = None
+    valid = False
 
     app = QApplication(sys.argv)
+
+    try:
+        if not QDBusConnection.sessionBus().isConnected():
+            print("Cannot connect to the D-Bus session bus.\n"
+                    "To start it, run:\n"
+                    "\teval `dbus-launch --auto-syntax`\n");
+        else:
+            print("Connected to dbus")
+            dbus = QDBusInterface('com.darkoverlordofdata.wallpaper.downloaded', '/', '',
+                    QDBusConnection.sessionBus())
+            print("DBus is valid?")
+            print(dbus.isValid())
+            if dbus.isValid():
+                valid = True
+    finally:
+        pass
 
     screen = app.primaryScreen()
     size = screen.size()
@@ -339,5 +431,10 @@ Application Options:
         elif opt in ["-t", "--tz"]:
             tz = int(arg)
 
-    ex = CatLock(os.uname().sysname, pin, fontFamily, tz, width, height)
-    sys.exit(app.exec_())
+    print("starting...")
+
+    ex = CatLock(dbus, valid, os.uname().sysname, pin, fontFamily, tz, width, height)
+    app.exec_()
+    sys.exit()
+
+

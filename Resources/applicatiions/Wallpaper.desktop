@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Name=Wallpaper
+Exec=/usr/bin/python3 /home/darko/.local/share/Wallpaper.app/Wallpaper
+Comment=
+Terminal=false
+Icon=/home/darko/.local/share/Wallpaper.app/Resources/Wallpaper.png
+Type=Application
