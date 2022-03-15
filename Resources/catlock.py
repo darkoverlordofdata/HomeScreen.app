@@ -100,21 +100,21 @@ class CatLock(QWidget):
             self.full_name = pwd.getpwuid(os.getuid()).pw_name
 
 
-        with open(LOCAL + '/Resources/themes/wallpaper.description') as f:
+        with open(LOCAL + '/themes/wallpaper.description') as f:
             self.title = f.readline()
             tmp = f.readline()
             self.info = tmp.split("(")[0]
             self.copyright = tmp.split("(")[1]
 
-        self.authorize = QPixmap(LOCAL + '/Resources/themes/wallpaper.authorize.jpg')
-        self.locked = QPixmap(LOCAL + '/Resources/themes/wallpaper.locked.jpg')
+        self.authorize = QPixmap(LOCAL + '/themes/wallpaper.authorize.jpg')
+        self.locked = QPixmap(LOCAL + '/themes/wallpaper.locked.jpg')
 
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         if os.path.exists(f'/{HOME}/.iface'):
             self.avatar = QPixmap(f'{HOME}/.iface')
         else:
-            self.avatar = QPixmap(LOCAL + '/Resources/avatar.png')
+            self.avatar = QPixmap(LOCAL + '/avatar.png')
     
         fnt_60 = QFont(self.fontFamily, 60, QFont.Normal)
         fnt_30 = QFont(self.fontFamily, 30, QFont.Normal)
@@ -346,14 +346,14 @@ def checkDownloadStatus(self, valid, dbus):
                 if reply.value() == True:
                     print("checkDownloadStatus: dbus returned True")
                     # load new screen image
-                    with open(LOCAL + '/Resources/themes/wallpaper.description') as f:
+                    with open(LOCAL + '/themes/wallpaper.description') as f:
                         self.title = f.readline()
                         tmp = f.readline()
                         self.info = tmp.split("(")[0]
                         self.copyright = tmp.split("(")[1]
 
-                    self.authorize = QPixmap(LOCAL + '/Resources/themes/wallpaper.authorize.jpg')
-                    self.locked = QPixmap(LOCAL + '/Resources/themes/wallpaper.locked.jpg')
+                    self.authorize = QPixmap(LOCAL + '/themes/wallpaper.authorize.jpg')
+                    self.locked = QPixmap(LOCAL + '/themes/wallpaper.locked.jpg')
                     self.reset()
 
                     # restart program & exit

@@ -18,7 +18,7 @@ class ImageList(QMainWindow):
         self.listWidget.setViewMode(QListView.IconMode)
         self.item = QListWidgetItem()
         self.icon = QIcon()
-        self.icon.addPixmap(QPixmap((f'{LOCAL}/Resources/gallery/BobbioItaly_EN-US7115321929.jpeg'))) #, QIcon.Normal, QIcon.Off))
+        self.icon.addPixmap(QPixmap((f'{LOCAL}/gallery/BobbioItaly_EN-US7115321929.jpeg'))) #, QIcon.Normal, QIcon.Off))
         self.item.setIcon(self.icon)
         self.listWidget.addItem(self.item)
 
@@ -28,7 +28,7 @@ class ImageList(QMainWindow):
         # lay = QVBoxLayout(self.central_widget)
         
         # label = QLabel(self)
-        # pixmap = QPixmap(f'{LOCAL}/Resources/gallery/BobbioItaly_EN-US7115321929.jpeg')
+        # pixmap = QPixmap(f'{LOCAL}/gallery/BobbioItaly_EN-US7115321929.jpeg')
         # label.setPixmap(pixmap)
         # self.resize(pixmap.width(), pixmap.height())
         

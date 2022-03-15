@@ -39,13 +39,13 @@ if __name__ == "__main__":
     full_image_url = "https://www.bing.com" + image_url
     img_data = requests.get(full_image_url).content
 
-    with open(f'{LOCAL}/Resources/imagename', 'w') as f:
+    with open(f'{LOCAL}/imagename', 'w') as f:
         f.write(urlbase)
 
-    with open(f'{LOCAL}/Resources/gallery/{urlbase}.jpeg', 'wb') as f:
+    with open(f'{LOCAL}/gallery/{urlbase}.jpeg', 'wb') as f:
         f.write(img_data)
 
-    with open(f'{LOCAL}/Resources/gallery/{urlbase}', 'w') as f:
+    with open(f'{LOCAL}/gallery/{urlbase}', 'w') as f:
         f.write(title)
         f.write('\n')
         f.write(copyright)
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # width = 1920 # 1368
     # height = 1080 # 768
 
-    image = QImage(f'{LOCAL}/Resources/gallery/{urlbase}.jpeg', 'JPG')
+    image = QImage(f'{LOCAL}/gallery/{urlbase}.jpeg', 'JPG')
     locked = QPixmap.fromImage(image).scaled(width, height) #, Qt.KeepAspectRatio)
 
     for i in range(image.height()):
@@ -62,20 +62,20 @@ if __name__ == "__main__":
 
     authorize = QPixmap.fromImage(image).scaled(width, height) #, Qt.KeepAspectRatio)
 
-    authorize.save(f'{LOCAL}/Resources/themes/wallpaper.authorize.jpg')
-    locked.save(f'{LOCAL}/Resources/themes/wallpaper.locked.jpg')
-    with open(f'{LOCAL}/Resources/themes/wallpaper.description', 'w') as f:
+    authorize.save(f'{LOCAL}/themes/wallpaper.authorize.jpg')
+    locked.save(f'{LOCAL}/themes/wallpaper.locked.jpg')
+    with open(f'{LOCAL}/themes/wallpaper.description', 'w') as f:
         f.write(title)
         f.write('\n')
         f.write(copyright)
 
     # helloSystem?
     if os.path.exists('/usr/local/bin/launch'): 
-        os.system(f'launch Filer --set-wallpaper {LOCAL}/Resources/gallery/{urlbase}.jpeg')
+        os.system(f'launch Filer --set-wallpaper {LOCAL}/gallery/{urlbase}.jpeg')
 
     # LXDE?
     elif os.path.exists('/usr/bin/pcmanfm'): 
-        os.system(f'pcmanfm --set-wallpaper {LOCAL}/Resources/gallery/{urlbase}.jpeg')
+        os.system(f'pcmanfm --set-wallpaper {LOCAL}/gallery/{urlbase}.jpeg')
 
     # Unknown        
     else:
