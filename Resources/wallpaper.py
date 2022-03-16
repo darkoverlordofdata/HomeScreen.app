@@ -140,7 +140,7 @@ if __name__ == "__main__":
     width = size.width()
     height = size.height()
 
-    app.setQuitOnLastWindowClosed(False)
+    # app.setQuitOnLastWindowClosed(False)
     app.setAttribute(Qt.AA_UseHighDpiPixmaps)
     VM = WallpaperMenu(width, height)
     app.exec_()

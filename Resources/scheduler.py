@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 import time
@@ -74,7 +75,7 @@ Application Options:
     time_of_day= "01:01"            # default run time
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ht:", ["help", "time="])
+        opts, args = getopt.getopt(sys.argv[1:], "hot:", ["help", "time=", "once"])
     except getopt.GetoptError: 
         print(getopt.GetoptError)
         print(usage)
@@ -86,24 +87,34 @@ Application Options:
             sys.exit()
         elif opt in ["-t", "--time"]:
             time_of_day = arg
+        elif opt in ["-o", "--once"]:
+            time_of_day = arg
 
+    print("app")
     app = QCoreApplication(sys.argv)
 
+    print("QDBusConnection..isConnected")
     if not QDBusConnection.sessionBus().isConnected():
-        sys.stderr.write("Cannot connect to the D-Bus session bus.\n"
+        print("Cannot connect to the D-Bus session bus.\n"
                 "To start it, run:\n"
                 "\teval `dbus-launch --auto-syntax`\n");
         sys.exit(1)
 
+    print("QDBusConnection..registerService")
     if not QDBusConnection.sessionBus().registerService('com.darkoverlordofdata.wallpaper.downloaded'):
-        sys.stderr.write("%s\n" % QDBusConnection.sessionBus().lastError().message())
+        print("%s\n" % QDBusConnection.sessionBus().lastError().message())
         sys.exit(1)
 
+    print("WallpaperProxy")
     proxy = WallpaperProxy()
+    print("QDBusConnection..registerService")
     QDBusConnection.sessionBus().registerObject('/', proxy,
             QDBusConnection.ExportAllSlots)
 
+    print("schedule")
     schedule.every().day.at(time_of_day).do(run_download, proxy=proxy)
+    print("run_continuously")
     run_continuously()
+    print("app.exec_")
     sys.exit(app.exec_())
 
