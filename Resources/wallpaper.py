@@ -5,11 +5,21 @@ import sys
 import subprocess
 
 from PyQt5.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QAction, QMessageBox
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QCursor
 from PyQt5.QtCore import Qt, QProcess, QObject
 
 
 LOCAL = os.path.dirname(os.path.abspath(__file__))
+
+class TrayIcon(QSystemTrayIcon):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.activated.connect(self.showMenuOnTrigger)
+
+    def showMenuOnTrigger(self, reason):
+        if reason == QSystemTrayIcon.Trigger:
+            self.contextMenu().popup(QCursor.pos())
 
         
 class WallpaperMenu(QObject):
@@ -18,11 +28,13 @@ class WallpaperMenu(QObject):
 
         super().__init__()
 
+
         icon = QIcon(f'{LOCAL}/Wallpaper.png')
  
         self.width = width
         self.height = height
-        self.tray = QSystemTrayIcon()
+        # self.tray = QSystemTrayIcon()
+        self.tray = TrayIcon()
         self.tray.setIcon(icon)
         self.tray.setVisible(True)
         self.menu = QMenu()
@@ -34,6 +46,7 @@ class WallpaperMenu(QObject):
         
         self.refreshMenu()
 
+            
     def onClicked(self, reason):
         self.refreshMenu()
 

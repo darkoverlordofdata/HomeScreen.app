@@ -11,6 +11,8 @@ import sys
 import os
 import json
 import requests
+import dbus
+import subprocess
 from os.path import exists
 
 
@@ -77,9 +79,36 @@ if __name__ == "__main__":
     elif os.path.exists('/usr/bin/pcmanfm'): 
         os.system(f'pcmanfm --set-wallpaper {LOCAL}/gallery/{urlbase}.jpeg')
 
-    # Unknown        
+
+    # KDE?
+    elif os.environ['XDG_CURRENT_DESKTOP'] == 'KDE':
+        plugin = 'org.kde.image'
+        filepath = f'{LOCAL}/gallery/{urlbase}.jpeg}'
+        user = os.environ['USER']
+
+        jscript = """
+        var allDesktops = desktops();
+        print (allDesktops);
+        for (i=0;i<allDesktops.length;i++) {
+            d = allDesktops[i];
+            d.wallpaperPlugin = "%s";
+            d.currentConfigGroup = Array("Wallpaper", "%s", "General");
+            d.writeConfig("Image", "file://%s")
+        }
+        """
+        bus = dbus.SessionBus()
+        plasma = dbus.Interface(bus.get_object('org.kde.plasmashell', '/PlasmaShell'), dbus_interface='org.kde.PlasmaShell')
+        plasma.evaluateScript(jscript % (plugin, plugin, filepath))
+
+        cmd_script = [
+            'DISPLAY=:0' 
+            f'kwriteconfig5 --file /home/{user}/.config/kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "file://${filepath}"'
+        ] 
+        subprocess.call(cd_script)
+
+    # Unknown???       
     else:
-        print('oops!')
+        print('Desktop not recognized')
 
 
 
