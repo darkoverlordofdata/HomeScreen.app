@@ -103,8 +103,8 @@ class CatLock(QWidget):
         with open(LOCAL + '/themes/wallpaper.description') as f:
             self.title = f.readline()
             tmp = f.readline()
-            self.info = tmp.split("(")[0]
-            self.copyright = tmp.split("(")[1]
+            self.info = tmp.split("(©")[0]
+            self.copyright = "(©" + tmp.split("(©")[1]
 
         self.authorize = QPixmap(LOCAL + '/themes/wallpaper.authorize.jpg')
         self.locked = QPixmap(LOCAL + '/themes/wallpaper.locked.jpg')

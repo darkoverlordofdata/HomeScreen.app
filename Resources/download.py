@@ -83,7 +83,7 @@ if __name__ == "__main__":
     # KDE?
     elif os.environ['XDG_CURRENT_DESKTOP'] == 'KDE':
         plugin = 'org.kde.image'
-        filepath = f'{LOCAL}/gallery/{urlbase}.jpeg}'
+        filepath = f'{LOCAL}/gallery/{urlbase}.jpeg'
         user = os.environ['USER']
 
         jscript = """
