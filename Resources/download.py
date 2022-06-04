@@ -84,6 +84,7 @@ if __name__ == "__main__":
     elif os.environ['XDG_CURRENT_DESKTOP'] == 'KDE':
         plugin = 'org.kde.image'
         filepath = f'{LOCAL}/gallery/{urlbase}.jpeg'
+        filepath = filepath.replace("/./", "/")
         user = os.environ['USER']
 
         jscript = """
@@ -93,18 +94,20 @@ if __name__ == "__main__":
             d = allDesktops[i];
             d.wallpaperPlugin = "%s";
             d.currentConfigGroup = Array("Wallpaper", "%s", "General");
-            d.writeConfig("Image", "file://%s")
+            d.writeConfig("Image", "%s")
         }
         """
+        print(jscript % (plugin, plugin, filepath))
+
         bus = dbus.SessionBus()
         plasma = dbus.Interface(bus.get_object('org.kde.plasmashell', '/PlasmaShell'), dbus_interface='org.kde.PlasmaShell')
         plasma.evaluateScript(jscript % (plugin, plugin, filepath))
 
         cmd_script = [
-            'DISPLAY=:0' 
-            f'kwriteconfig5 --file /home/{user}/.config/kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "file://${filepath}"'
+            'DISPLAY=:0 ' 
+            f'/usr/bin/kwriteconfig5 --file /home/{user}/.config/kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image {filepath}'
         ] 
-        subprocess.call(cd_script)
+        subprocess.run(cmd_script,shell=True)
 
     # Unknown???       
     else:

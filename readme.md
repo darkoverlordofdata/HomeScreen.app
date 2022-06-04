@@ -23,8 +23,5 @@ git clone https://github.com/darkoverlordofdata/Wallpaper.app.git
 .local/share/Wallpaper.app/Resources/catlock.py -p 420420
 
 
+/home/darko/.local/share/Wallpaper.app/Catlock "-p" "420420"
 
-Traceback (most recent call last):
-  File "/home/darko/.local/share/Wallpaper.app/Resources/download.py", line 107, in <module>
-    subprocess.call(cd_script)
-NameError: name 'cd_script' is not defined
