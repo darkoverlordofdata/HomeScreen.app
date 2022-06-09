@@ -110,7 +110,7 @@ class WallpaperMenu(QObject):
 
     # download latest image cache
     def doDownload(self):
-        subprocess.Popen(["python3", f'{LOCAL}/download.py'])          
+        subprocess.run(["python3", f'{LOCAL}/download.py'], shell=True)
 
 
     # start the download scheduler

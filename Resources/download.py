@@ -97,11 +97,13 @@ if __name__ == "__main__":
             d.writeConfig("Image", "%s")
         }
         """
-        print(jscript % (plugin, plugin, filepath))
+        # print(jscript % (plugin, plugin, filepath))
 
         bus = dbus.SessionBus()
         plasma = dbus.Interface(bus.get_object('org.kde.plasmashell', '/PlasmaShell'), dbus_interface='org.kde.PlasmaShell')
         plasma.evaluateScript(jscript % (plugin, plugin, filepath))
+
+        print( f'/usr/bin/kwriteconfig5 --file /home/{user}/.config/kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image {filepath}' )
 
         cmd_script = [
             'DISPLAY=:0 ' 
