@@ -104,7 +104,7 @@ class CatLock(QWidget):
             self.title = f.readline()
             tmp = f.readline()
             self.info = tmp.split("(©")[0]
-            self.copyright = "(©" + tmp.split("(©")[1]
+            self.copyright = "(©" + tmp.split("(©")[1] + ")"
 
         self.authorize = QPixmap(LOCAL + '/themes/wallpaper.authorize.jpg')
         self.locked = QPixmap(LOCAL + '/themes/wallpaper.locked.jpg')
@@ -214,8 +214,8 @@ class CatLock(QWidget):
 
         currentTime = currentTime.addSecs(adj)
 
-        self.clock.setText(currentTime.toString('h:mm a'))
-        self.calendar.setText(currentTime.toString('dddd, MMMM d'))
+        self.clock.setText(currentTime.toString('h:mm a      '))
+        self.calendar.setText(currentTime.toString('dddd,  MMMM d      '))
 
         # check if we're ready to return to lock screen
         if self.lockedFlag == False:
