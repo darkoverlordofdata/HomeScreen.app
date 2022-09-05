@@ -79,6 +79,10 @@ if __name__ == "__main__":
     elif os.path.exists('/usr/bin/pcmanfm'): 
         os.system(f'pcmanfm --set-wallpaper {LOCAL}/gallery/{urlbase}.jpeg')
 
+    # MATE
+    elif os.environ['XDG_CURRENT_DESKTOP'] == 'MATE':
+        os.system(f'dconf write /org/mate/desktop/background/picture-filename "\'{LOCAL}/gallery/{urlbase}.jpeg\'"')
+
 
     # KDE?
     elif os.environ['XDG_CURRENT_DESKTOP'] == 'KDE':
