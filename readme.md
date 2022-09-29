@@ -18,7 +18,7 @@ git clone https://github.com/darkoverlordofdata/Wallpaper.app.git
 * download daily wallpaper - ( bing, etc. )
 
 
-/Applications/Autostart/Wallpaper.app/Resources/catlock.py -p 420420
+/Applications/Utilities/Wallpaper.app/Resources/catlock.py -p 420420 -t -3
 
 .local/share/Wallpaper.app/Resources/catlock.py -p 420420
 
