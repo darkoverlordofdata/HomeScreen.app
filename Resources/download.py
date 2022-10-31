@@ -71,6 +71,8 @@ if __name__ == "__main__":
         f.write('\n')
         f.write(copyright)
 
+    XDG_CURRENT_DESKTOP = os.environ['XDG_CURRENT_DESKTOP']
+    print(f'XDG_CURRENT_DESKTOP = {XDG_CURRENT_DESKTOP}')
     # helloSystem?
     if os.path.exists('/usr/local/bin/launch'): 
         os.system(f'launch Filer --set-wallpaper {LOCAL}/gallery/{urlbase}.jpeg')
@@ -79,11 +81,13 @@ if __name__ == "__main__":
     elif os.path.exists('/usr/bin/pcmanfm'): 
         os.system(f'pcmanfm --set-wallpaper {LOCAL}/gallery/{urlbase}.jpeg')
 
+    # Ubuntu Unity?
+    elif os.environ['XDG_CURRENT_DESKTOP'] == 'Unity':
+        print(f'"file://\'{LOCAL}/gallery/{urlbase}.jpeg\'"')
+        os.system(f'dconf write /org/gnome/desktop/background/picture-uri "\'file://{LOCAL}/gallery/{urlbase}.jpeg\'"')
     # MATE
     elif os.environ['XDG_CURRENT_DESKTOP'] == 'MATE':
         os.system(f'dconf write /org/mate/desktop/background/picture-filename "\'{LOCAL}/gallery/{urlbase}.jpeg\'"')
-
-
     # KDE?
     elif os.environ['XDG_CURRENT_DESKTOP'] == 'KDE':
         plugin = 'org.kde.image'

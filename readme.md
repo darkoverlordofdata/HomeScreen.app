@@ -4,6 +4,9 @@
 coordinate login, wallpaper and lock screen into a theme.
 ## Install
 
+### dependencies
+sudo apt install python3-pyqt5
+
 ### helloSystem
 cd /Applications/AutoStart
 git clone https://github.com/darkoverlordofdata/Wallpaper.app.git
@@ -23,5 +26,5 @@ git clone https://github.com/darkoverlordofdata/Wallpaper.app.git
 .local/share/Wallpaper.app/Resources/catlock.py -p 420420
 
 
-/home/darko/.local/share/Wallpaper.app/Catlock "-p" "420420"
+/home/darko/.local/share/Wallpaper.app/Resources/catlock.py "-p" "420420"
 
