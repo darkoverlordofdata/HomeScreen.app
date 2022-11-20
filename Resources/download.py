@@ -83,6 +83,10 @@ if __name__ == "__main__":
     elif os.path.exists('/usr/bin/pcmanfm'): 
         os.system(f'pcmanfm --set-wallpaper {LOCAL}/gallery/{urlbase}.jpeg')
 
+    # Ubuntu Gnome
+    elif os.environ['XDG_CURRENT_DESKTOP'] == 'ubuntu:GNOME':
+        os.system(f'dconf write /org/gnome/desktop/background/picture-uri "\'file://{LOCAL}/gallery/{urlbase}.jpeg\'"')
+
     # Ubuntu Unity
     elif os.environ['XDG_CURRENT_DESKTOP'] == 'Unity':
         os.system(f'dconf write /org/gnome/desktop/background/picture-uri "\'file://{LOCAL}/gallery/{urlbase}.jpeg\'"')
